@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h1>G2 like server</h1>
+	<h:form>
+		<p:messages id="varmessages" showDetail="true" />
+		<h:panelGrid columns="2" id="variablePanel">
+			<p:outputLabel value="Variable name" />
+			<p:outputLabel value="Variable value" />
+
+			<p:inputText value="#{workspaceManager.newObjectName}" />
+			<p:inputText value="#{workspaceManager.newObjectValue}" />
+		</h:panelGrid>
+		<p:commandButton value="Add" action="#{workspaceManager.addNew()}"
+			update=":objTablePanel,variablePanel,varmessages" />
+	</h:form>
+	<p:panel id="objTablePanel">
+		<p:dataTable id="objTable" value="#{workspaceManager.objectList}"
+			var="obj">
+			<p:column headerText="Variable name">
+				<h:outputText value="#{obj.getName()}" />
+			</p:column>
+			<p:column headerText="Variable value">
+				<h:outputText value="#{obj.getValue()}" />
+			</p:column>
+			<p:column>
+				<p:commandButton value="remove"
+					action="#{workspaceManager.removeObject(obj.getName())}"
+					update="objTablePanel"></p:commandButton>
+			</p:column>
+		</p:dataTable>
+	</p:panel>
+	<h1>Expression</h1>
+	<h:form>
+		<p:messages id="messages" showDetail="true" />
+		<h:panelGrid columns="2">
+			<h:outputText value="Expression:" />
+			<p:inputTextarea value="#{workspaceManager.expressions}" cols="80" />
+			
+			<h:outputText value="Value to set result:" />
+			<p:inputText id="valueToSet" value="#{workspaceManager.valueToSet}" />
+			
+			<p:commandButton value="Evaulate"
+				update="expResult,messages,expDiagram,expTreeNode,objTablePanel"
+				action="#{workspaceManager.process()}" />
+			<p:outputLabel id="expResult" value="#{workspaceManager.result}" />			
+		</h:panelGrid>
+		<h2>TreeNode</h2>
+		<p:tree id="expTreeNode" value="#{workspaceManager.root}" var="node">
+			<p:treeNode>
+				<h:outputText value="#{node}" />
+			</p:treeNode>
+		</p:tree>
+	</h:form>
+	<h:form id="downloadForm">
+		<p:commandButton value="Download" ajax="false"			
+			icon="ui-icon-arrowthick-1-s">
+			<p:fileDownload value="#{workspaceManager.getWorkspaceFile()}" />
+		</p:commandButton>
+	</h:form>
+	<h2>Diagram</h2>
+	<p:diagram id="expDiagram" value="#{workspaceManager.model}"
+		style="height:400px" styleClass="ui-widget-content" />
+</ui:composition>
